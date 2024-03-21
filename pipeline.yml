@@ -1,0 +1,36 @@
+trigger: none
+
+# Azure Pipeline YAML file
+# Define pipeline variables
+variables:
+  - group: "Mine Variabler"
+  - group: 'KeyVault'
+
+# Define stages
+stages:
+- stage: OutputMessage
+
+  jobs:
+  - job: PrintMessage
+    displayName: "Print Message"
+
+    steps:
+    - script: echo "$(Hemmelighed)"
+      displayName: 'Output Message'
+
+#    - task: AzureCLI@2
+#      inputs:
+#        azureSubscription: 'MySC'
+#        inlineScript: az group create -n AZ-400 -l swedencentral
+#        scriptLocation: inlineScript
+#        scriptType: bash
+    
+    - task: AzureResourceManagerTemplateDeployment@3
+      displayName: 'Deploy all infrastructure'
+      inputs:
+        connectedServiceName: MySC
+        location: swedencentral
+        resourceGroupName: AZ-204
+        csmFile: infrastructure.bicep
+        overrideParameters:
+          -hiddenParam $(Hemmelighed)
